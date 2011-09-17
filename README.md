@@ -4,7 +4,7 @@ Protoparse
 Protoparse (short for protocol parser because my name creativity isn't so good) allows you to unpack binary data (and normal data) from streams and buffers.
 
 Much like [substacks node-binary](https://github.com/substack/node-binary "github repository for substacks node-binary") (it even uses some code),
-but with a focus on *speed, stability and extensibility*.
+but with a focus on speed, stability and extensibility.
 
 Examples
 ========

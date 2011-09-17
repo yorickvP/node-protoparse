@@ -380,14 +380,16 @@ exports.loop = function (test) {
     }, 500);
     
     Parser.Stream(em)
-        .tap(function loop() { // does this recurse? maybe I need to implement actual loops :P
-                this.word16lu('a')
-                    .word8u('b')
-                    .word8s('c')
-                    .tap(function(vars) {
-                        times++;
-                        if (vars.c >= 0) this.tap(loop)
-                    });})
+        .loop(function(end) {
+            var a = this._queue
+            this.word16lu('a')
+                .word8u('b')
+                .word8s('c')
+                .tap(function(vars) {
+                    times++
+                    if (vars.c < 0) end()
+                }, null, true)
+        })
         .tap(function (vars) {
             clearTimeout(to);
             assert.deepEqual(vars, { a : 1337, b : 55, c : -5 });
@@ -499,43 +501,44 @@ exports.getBuffer = function (test) {
     ;
 };
 
-//exports.interval = function (test) {
-//    var to = setTimeout(function () {
-//        assert.fail('loop populated by interval never finished');
-//    }, 5000);
-//    
-//    var em = new EventEmitter;
-//    var i = 0;
-//    var iv = setInterval(function () {
-//        var buf = new Buffer(1000);
-//        buf[0] = 0xff;
-//        if (++i >= 1000) {
-//            clearInterval(iv);
-//            buf[0] = 0;
-//        }
-//        em.emit('data', buf);
-//    }, 1);
-//    
-//    var loops = 0;
-//    Binary(em)
-//        .loop(function (end) {
-//            this
-//            .word8('x')
-//            .word8('y')
-//            .word32be('z')
-//            .word32le('w')
-//            .buffer('buf', 1000 - 10)
-//            .tap(function (vars) {
-//                loops ++;
-//                if (vars.x == 0) end();
-//            })
-//        })
-//        .tap(function () {
-//            clearTimeout(to);
-//            assert.deepEqual(loops, 1000);
-//        })
-//    ;
-//};
+exports.interval = function (test) {
+    var to = setTimeout(function () {
+        assert.fail('loop populated by interval never finished');
+    }, 5000);
+    
+    var em = new EventEmitter;
+    var i = 0;
+    var iv = setInterval(function () {
+        var buf = new Buffer(1000);
+        buf[0] = 0xff;
+        if (++i >= 1000) {
+            clearInterval(iv);
+            buf[0] = 0;
+        }
+        em.emit('data', buf);
+    }, 1);
+    
+    var loops = 0;
+    Parser.Stream(em)
+        .loop(function (end) {
+            this
+            .word8('x')
+            .word8('y')
+            .word32be('z')
+            .word32le('w')
+            .buffer('buf', 1000 - 10)
+            .tap(function (vars) {
+                loops ++;
+                if (vars.x == 0) end();
+            })
+        })
+        .tap(function () {
+            clearTimeout(to);
+            assert.equal(loops, 1000);
+            test.finish();
+        })
+    ;
+};
 
 exports.skip = function (test) {
     var to = setTimeout(function () {

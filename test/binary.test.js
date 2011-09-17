@@ -71,7 +71,7 @@ exports.immediate = function (test) {
     }, 500);
     
     var em = new EventEmitter;
-    Parser.Stream(em, null, 'moo')
+    Parser.Stream(em, 'moo')
         .word8('a')
         .word16be('bc')
         .tap(function (vars) {

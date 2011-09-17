@@ -13,6 +13,8 @@ function Parser(buffer, prototype) {
         while(i = this._provide(this._keystore, this._buffer, this._buffer.bytes))
             i.f.call(this, this._keystore, this._buffer, this._buffer.bytes)
         return this }
+    cp.flush = function() {
+        return this.tap(function(k) { for (var x in k) delete k[x] })}
     cp.addData = function(buffer) {
         cp._buffer.addData(buffer)
         return cp.run() }

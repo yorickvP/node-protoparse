@@ -44,24 +44,25 @@ exports.fromBuffer = function (test) {
 //    ;
 //};
 
-//exports.flush = function (test) {
-//    var to = setTimeout(function () {
-//        assert.fail('never tapped');
-//    }, 500);
-//    
-//    Binary.parse(new Buffer([ 97, 98, 99, 100, 101, 102 ]))
-//        .word8('a')
-//        .word16be('b')
-//        .word16be('c')
-//        .flush()
-//        .word8('d')
-//        .tap(function (vars) {
-//            clearTimeout(to);
-//            assert.deepEqual(vars, { d : 102 });
-//            test.finish();
-//        })
-//    ;
-//};
+exports.flush = function (test) {
+    var to = setTimeout(function () {
+        assert.fail('never tapped');
+    }, 500);
+    
+    Parser(new Buffer([ 97, 98, 99, 100, 101, 102 ]))
+        .word8('a')
+        .word16be('b')
+        .word16be('c')
+        .flush()
+        .word8('d')
+        .tap(function (vars) {
+            clearTimeout(to);
+            assert.deepEqual(vars, { d : 102 });
+            test.finish();
+        })
+        .run()
+    ;
+};
 
 exports.immediate = function (test) {
     var to = setTimeout(function () {

@@ -4,31 +4,32 @@ var Chain_Binary = Object.create(ChainProvider.prototype)
 
 // add functions for binary parsing
 // thank you https://github.com/substack/node-binary/blob/master/index.js#L308
+// converting Math.pow to << fails on larger numbers. don't do it ;)
 ;(function() {
 // convert byte strings to unsigned little endian numbers
 function decodeLEu(bytes) {
     var acc = 0
     for (var i = 0; i < bytes.length; i++)
-        acc |= bytes[i] << (8 * i)
+        acc += bytes[i] * Math.pow(256,i)
     return acc }
 
 // convert byte strings to unsigned big endian numbers
 function decodeBEu(bytes) {
     var acc = 0
     for (var i = 0; i < bytes.length; i++)
-        acc |= bytes[i] << (8 * (bytes.length - i - 1))
+        acc += Math.pow(256, bytes.length - i - 1) * bytes[i]
     return acc }
 
 // convert byte strings to signed big endian numbers
 function decodeBEs(bytes) {
     var val = decodeBEu(bytes)
-    if (bytes[0] & 0x80) val -= 1 << bytes.length
+    if (bytes[0] & 0x80) val -= Math.pow(256, bytes.length)
     return val }
 
 // convert byte strings to signed little endian numbers
 function decodeLEs(bytes) {
     var val = decodeLEu(bytes)
-    if (bytes[bytes.length - 1] & 0x80) val -= 1 << bytes.length
+    if (bytes[bytes.length - 1] & 0x80) val -= Math.pow(256, bytes.length)
     return val }
 
 function decode(bytes, fun) {

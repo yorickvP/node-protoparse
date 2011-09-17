@@ -19,7 +19,7 @@ function BufferList() {
         return ret }
     return bl }
 
-function Parser(prototype) {
+function Parser(buffer, prototype) {
     if (!prototype) prototype = BinaryChainProvider
     var cp = ChainProvider(prototype)
     cp._keystore = {}
@@ -32,17 +32,18 @@ function Parser(prototype) {
     cp.addData = function(buffer) {
         cp._buffer.addData(buffer)
         return cp.run() }
+    if (buffer) cp.addData(buffer)
     return cp
 }
 
 function StreamParser(stream, prototype, data_cbname) {
-    var p = Parser(prototype)
+    var p = Parser(null, prototype)
     stream.on(data_cbname || 'data', p.addData)
     return p
 }
 
 if (module && module.exports) {
     module.exports = Parser
-    module.exports.StreamParser = StreamParser
+    module.exports.Stream = StreamParser
     module.exports.BufferList = BufferList }
 

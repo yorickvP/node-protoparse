@@ -17,6 +17,19 @@ function BufferList() {
             if (bl[0].length <= toRead) bl.shift()
             else bl[0] = bl[0].slice(toRead) }
         return ret }
+    bl.getbuffer = function(n) {
+        if (bl.bytes < n) return
+        bl.bytes -= n
+        var ret = Buffer(n)
+        var cursize = 0
+        while(cursize < n) {
+            var toRead = n - cursize
+            var actualread = Math.min(bl[0].length, toRead)
+            bl[0].copy(ret, cursize, 0, actualread)
+            cursize += actualread
+            if (bl[0].length == actualread) bl.shift()
+            else bl[0] = bl[0].slice(actualread) }
+        return ret }
     return bl }
 
 function Parser(buffer, prototype) {

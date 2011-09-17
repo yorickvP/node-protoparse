@@ -467,35 +467,37 @@ exports.loop = function (test) {
 //    }, 30);
 //};
 
-//exports.getBuffer = function (test) {
-//    var t1 = setTimeout(function () {
-//        assert.fail('first buffer never finished');
-//    }, 20);
-//    
-//    var t2 = setTimeout(function () {
-//        assert.fail('second buffer never finished');
-//    }, 20);
-//    
-//    var buf = new Buffer([ 4, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14 ]);
-//    Binary.parse(buf)
-//        .word8('a')
-//        .buffer('b', 7)
-//        .word16lu('c')
-//        .tap(function (vars) {
-//            clearTimeout(t1);
-//            assert.deepEqual(vars, {
-//                a : 4, 
-//                b : new Buffer([ 2, 3, 4, 5, 6, 7, 8 ]),
-//                c : 2569,
-//            });
-//        })
-//        .buffer('d', 'a')
-//        .tap(function (vars) {
-//            clearTimeout(t2);
-//            assert.deepEqual(vars.d, new Buffer([ 11, 12, 13, 14 ]));
-//        })
-//    ;
-//};
+exports.getBuffer = function (test) {
+    var t1 = setTimeout(function () {
+        assert.fail('first buffer never finished');
+    }, 20);
+    
+    var t2 = setTimeout(function () {
+        assert.fail('second buffer never finished');
+    }, 20);
+    
+    var buf = new Buffer([ 4, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14 ]);
+    Parser(buf)
+        .word8('a')
+        .buffer('b', 7)
+        .word16lu('c')
+        .tap(function (vars) {
+            clearTimeout(t1);
+            assert.deepEqual(vars, {
+                a : 4, 
+                b : new Buffer([ 2, 3, 4, 5, 6, 7, 8 ]),
+                c : 2569,
+            });
+        })
+        .buffer('d', 'a')
+        .tap(function (vars) {
+            clearTimeout(t2);
+            assert.deepEqual(vars.d, new Buffer([ 11, 12, 13, 14 ]));
+            test.finish();
+        })
+        .run()
+    ;
+};
 
 //exports.interval = function (test) {
 //    var to = setTimeout(function () {
@@ -535,63 +537,66 @@ exports.loop = function (test) {
 //    ;
 //};
 
-//exports.skip = function (test) {
-//    var to = setTimeout(function () {
-//        assert.fail('Never finished');
-//    }, 1000);
-//    
-//    var em = new EventEmitter;
-//    var state = 0;
-//    
-//    Binary(em)
-//        .word16lu('a')
-//        .tap(function () { state = 1 })
-//        .skip(7)
-//        .tap(function () { state = 2 })
-//        .word8('b')
-//        .tap(function () { state = 3 })
-//        .tap(function (vars) {
-//            clearTimeout(to);
-//            assert.deepEqual(state, 3);
-//            assert.deepEqual(vars, {
-//                a : 2569,
-//                b : 8,
-//            });
-//        })
-//    ;
-//    
-//    Seq()
-//        .seq(setTimeout, Seq, 20)
-//        .seq(function () {
-//            assert.deepEqual(state, 0);
-//            em.emit('data', new Buffer([ 9 ]));
-//            this(null);
-//        })
-//        .seq(setTimeout, Seq, 5)
-//        .seq(function () {
-//            assert.deepEqual(state, 0);
-//            em.emit('data', new Buffer([ 10, 1, 2 ]));
-//            this(null);
-//        })
-//        .seq(setTimeout, Seq, 30)
-//        .seq(function () {
-//            assert.deepEqual(state, 1);
-//            em.emit('data', new Buffer([ 3, 4, 5 ]));
-//            this(null);
-//        })
-//        .seq(setTimeout, Seq, 15)
-//        .seq(function () {
-//            assert.deepEqual(state, 1);
-//            em.emit('data', new Buffer([ 6, 7 ]));
-//            this(null);
-//        })
-//        .seq(function () {
-//            assert.deepEqual(state, 2);
-//            em.emit('data', new Buffer([ 8 ]));
-//            this(null);
-//        })
-//    ;
-//};
+exports.skip = function (test) {
+    var to = setTimeout(function () {
+        assert.fail('Never finished');
+    }, 1000);
+    
+    var em = new EventEmitter;
+    var state = 0;
+    
+    Parser.Stream(em)
+        .word16lu('a')
+        .tap(function () { state = 1 })
+        .skip(7)
+        .tap(function () { state = 2 })
+        .word8('b')
+        .tap(function () { state = 3 })
+        .tap(function (vars) {
+            clearTimeout(to);
+            assert.equal(state, 3);
+            assert.deepEqual(vars, {
+                a : 2569,
+                b : 8,
+            });
+            test.finish()
+        })
+    ;
+    
+    // the original used Seq. this should work too :)
+    function Step() { var i = 0, a = arguments
+        return function next() { a[i++].apply(next, arguments) }() }
+    
+    Step(
+        function() { setTimeout(this, 20); },
+        function () {
+            assert.deepEqual(state, 0);
+            em.emit('data', new Buffer([ 9 ]));
+            this();
+        },
+        function() { setTimeout(this, 5); },
+        function () {
+            assert.deepEqual(state, 0);
+            em.emit('data', new Buffer([ 10, 1, 2 ]));
+            this();
+        },
+        function() { setTimeout(this, 30); },
+        function () {
+            assert.deepEqual(state, 1);
+            em.emit('data', new Buffer([ 3, 4, 5 ]));
+            this();
+        },
+        function() { setTimeout(this, 15); },
+        function () {
+            assert.deepEqual(state, 1);
+            em.emit('data', new Buffer([ 6, 7 ]));
+            this();
+        },
+        function () {
+            assert.deepEqual(state, 2);
+            em.emit('data', new Buffer([ 8 ]));
+        });
+};
 
 //exports.scan = function (test) {
 //    var to = setTimeout(function () {

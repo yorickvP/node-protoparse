@@ -2,6 +2,14 @@ var ChainProvider = require('./chainprovider.js')
 
 var Chain_Binary = Object.create(ChainProvider.prototype)
 
+Chain_Binary.skip = function(no_bytes) {
+    return this.tap(function(k, b) { b.getbytes(no_bytes) },
+                    function(k, b) { return b.bytes >= no_bytes }, true) }
+
+Chain_Binary.buffer = function(target, n) {
+    return this.tap(function(k, b) {
+        k[target] = b.getbuffer((typeof n == 'string') ? k[n] : n) },
+        function(k, b) { return b.bytes >= ((typeof n == 'string') ? k[n] : n) }, true) }
 // add functions for binary parsing
 // thank you https://github.com/substack/node-binary/blob/master/index.js#L308
 // converting Math.pow to << fails on larger numbers. don't do it ;)

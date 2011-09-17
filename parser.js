@@ -1,12 +1,12 @@
 var BinaryChainProvider = require('./binary.js')
   ,       ChainProvider = require('./chainprovider.js')
   ,          BufferList = require('./bufferlist.js')
-
+  ,            KeyStore = require('./keystore.js')
 
 function Parser(buffer, prototype) {
     if (!prototype) prototype = BinaryChainProvider
     var cp = ChainProvider(prototype)
-    cp._keystore = {}
+    cp._keystore = KeyStore()
     cp._buffer = BufferList()
     cp.run = function() {
         var i

@@ -9,8 +9,8 @@ Chain_Binary.skip = function(no_bytes) {
 
 Chain_Binary.buffer = function(target, n) {
     return this.tap(function(k, b) {
-        k[target] = b.getbuffer((typeof n == 'string') ? k[n] : n) },
-        function(k, b) { return b.bytes >= ((typeof n == 'string') ? k[n] : n) }, true) }
+        k._set(target, b.getbuffer((typeof n == 'string') ? k._get(n) : n)) },
+        function(k, b) { return b.bytes >= ((typeof n == 'string') ? k._get(n) : n) }, true) }
         
 Chain_Binary.scan = function(target, needle) {
     //var out = BufferList()
@@ -18,7 +18,7 @@ Chain_Binary.scan = function(target, needle) {
     return this.tap(function(k, b) {
         var pos = b.indexOf(needle)
         if (pos != -1) { 
-            k[target] = b.getbuffer(pos)
+            k._set(target, b.getbuffer(pos))
             b.getbytes(needle.length) }
     }, function(k, b) { return b.indexOf(needle) != -1 }, true) }
 //    return this.loop(function(end) {
@@ -27,7 +27,7 @@ Chain_Binary.scan = function(target, needle) {
 //        console.log(b, pos)
 //        if (pos > 0) out.addData(b.getbuffer(pos)) // todo: make it able to return a BufferList
 //        if (pos >= 0) {
-//            k[target] = out.getbuffer(out.bytes)
+//            k._set(target, out.getbuffer(out.bytes))
 //            end() }
 //        else out.addData(b.getbuffer(b.bytes)) }, function(k, b) {return b.bytes > 0})})}
 
@@ -64,7 +64,7 @@ function decodeLEs(bytes) {
 function decode(bytes, fun) {
     return function(into) {
         this.tap(function(keystore, buffer) {
-            keystore[into] = fun(buffer.getbytes(bytes)) }
+            keystore._set(into, fun(buffer.getbytes(bytes))) }
           , function(k, b) { return b.bytes >= bytes }, true)
         return this }}
 

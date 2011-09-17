@@ -19,30 +19,31 @@ exports.fromBuffer = function (test) {
     ;
 };
 
-//exports.dots = function (test) {
-//    var to = setTimeout(function () {
-//        assert.fail('never tapped');
-//    }, 500);
-//    
-//    Binary.parse(new Buffer([ 97, 98, 99, 100, 101, 102 ]))
-//        .word8('a')
-//        .word16be('b.x')
-//        .word16be('b.y')
-//        .word8('b.z')
-//        .tap(function (vars) {
-//            clearTimeout(to);
-//            assert.deepEqual(vars, {
-//                a : 97,
-//                b : {
-//                    x : 256 * 98 + 99,
-//                    y : 256 * 100 + 101,
-//                    z : 102
-//                },
-//            });
-//            test.finish();
-//        })
-//    ;
-//};
+exports.dots = function (test) {
+    var to = setTimeout(function () {
+        assert.fail('never tapped');
+    }, 500);
+    
+    Parser(new Buffer([ 97, 98, 99, 100, 101, 102 ]))
+        .word8('a')
+        .word16be('b.x')
+        .word16be('b.y')
+        .word8('b.z')
+        .tap(function (vars) {
+            clearTimeout(to);
+            assert.deepEqual(vars, {
+                a : 97,
+                b : {
+                    x : 256 * 98 + 99,
+                    y : 256 * 100 + 101,
+                    z : 102
+                },
+            });
+            test.finish();
+        })
+        .run()
+    ;
+};
 
 exports.flush = function (test) {
     var to = setTimeout(function () {

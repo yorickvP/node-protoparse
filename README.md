@@ -74,6 +74,7 @@ Todo
 ====
 
 Lots of things are still missing, including (in no particular order):
+
  *   The ability for my bufferlist to return new bufferlists (for use with scan)
  *   .into(). This would require less independence between ChainProvider and Parser, I think.
     .word8('stuff.other.stuff') is supported though.

@@ -417,57 +417,56 @@ exports.loop = function (test) {
 };
 
 
-//exports.loopscan = function (test) {
-//    var em = new EventEmitter;
-//    var times = 0;
-//    var to = setTimeout(function () {
-//        assert.fail('loop never terminated');
-//    }, 500);
+exports.loopscan = function (test) {
+    var em = new EventEmitter;
+    var times = 0;
+    var to = setTimeout(function () {
+        assert.fail('loop never terminated');
+    }, 500);
 
-//    Binary.stream(em)
-//        .loop(function (end) {
-//            var vars_ = this.vars;
-//            this
-//                .scan('filler', 'BEGINMSG')
-//                .buffer('cmd', 3)
-//                .word8('num')
-//                .tap(function (vars) {
-//                    assert.ok(vars === vars_);
-//                    if (vars.num != 0x02 && vars.num != 0x06) {
-//                        assert.deepEqual(vars.filler.length, 0);
-//                    }
-//                    times ++;
-//                    if (vars.cmd.toString('ascii') == 'end') end();
-//                })
-//            ;
-//        })
-//        .tap(function (vars) {
-//            clearTimeout(to);
-//            assert.deepEqual(vars.cmd.toString('ascii'), 'end');
-//			assert.deepEqual(vars.num, 0x08);
-//            assert.deepEqual(times, 8);
-//        })
-//    ;
+    Parser.Stream(em)
+        .loop(function (end) {
+            this
+                .scan('filler', 'BEGINMSG')
+                .buffer('cmd', 3)
+                .word8('num')
+                .tap(function (vars) {
+                    if (vars.num != 0x02 && vars.num != 0x06) {
+                        assert.equal(vars.filler.length, 0);
+                    }
+                    times ++;
+                    if (vars.cmd.toString('ascii') == 'end') end();
+                })
+            ;
+        })
+        .tap(function (vars) {
+            clearTimeout(to);
+            assert.equal(vars.cmd.toString('ascii'), 'end');
+			assert.equal(vars.num, 0x08);
+            assert.equal(times, 8);
+            test.finish();
+        })
+    ;
 
-//    setTimeout(function () {
-//        em.emit('data', new Buffer("BEGINMSGcmd\x01" +
-//                                   "GARBAGEDATAXXXX" +
-//                                   "BEGINMSGcmd\x02" +
-//                                   "BEGINMSGcmd\x03", 'ascii'));
-//    }, 10);
+    setTimeout(function () {
+        em.emit('data', new Buffer("BEGINMSGcmd\x01" +
+                                   "GARBAGEDATAXXXX" +
+                                   "BEGINMSGcmd\x02" +
+                                   "BEGINMSGcmd\x03", 'ascii'));
+    }, 10);
 
-//    setTimeout(function () {
-//        em.emit('data', new Buffer("BEGINMSGcmd\x04" +
-//                                   "BEGINMSGcmd\x05" +
-//                                   "GARBAGEDATAXXXX" +
-//                                   "BEGINMSGcmd\x06", 'ascii'));
-//        em.emit('data', new Buffer("BEGINMSGcmd\x07", 'ascii'));
-//    }, 20);
+    setTimeout(function () {
+        em.emit('data', new Buffer("BEGINMSGcmd\x04" +
+                                   "BEGINMSGcmd\x05" +
+                                   "GARBAGEDATAXXXX" +
+                                   "BEGINMSGcmd\x06", 'ascii'));
+        em.emit('data', new Buffer("BEGINMSGcmd\x07", 'ascii'));
+    }, 40);
 
-//    setTimeout(function () {
-//        em.emit('data', new Buffer("BEGINMSGend\x08", 'ascii'));
-//    }, 30);
-//};
+    setTimeout(function () {
+        em.emit('data', new Buffer("BEGINMSGend\x08", 'ascii'));
+    }, 70);
+};
 
 exports.getBuffer = function (test) {
     var t1 = setTimeout(function () {
@@ -601,52 +600,56 @@ exports.skip = function (test) {
         });
 };
 
-//exports.scan = function (test) {
-//    var to = setTimeout(function () {
-//        assert.fail('Never finished');
-//    }, 1000);
-//    
-//    var em = new EventEmitter;
-//    Binary(em)
-//        .word8('a')
-//        .scan('l1', new Buffer('\r\n'))
-//        .scan('l2', '\r\n')
-//        .word8('z')
-//        .tap(function (vars) {
-//            clearTimeout(to);
-//            assert.deepEqual(vars.a, 99);
-//            assert.deepEqual(vars.l1.toString(), 'foo bar');
-//            assert.deepEqual(vars.l2.toString(), 'baz');
-//            assert.deepEqual(vars.z, 42);
-//        })
-//    ;
-//    
-//    setTimeout(function () {
-//        em.emit('data', new Buffer([99,0x66,0x6f,0x6f,0x20]));
-//    }, 20);
-//    
-//    setTimeout(function () {
-//        em.emit('data', new Buffer('bar\r'));
-//    }, 40);
-//    
-//    setTimeout(function () {
-//        em.emit('data', new Buffer('\nbaz\r\n*'));
-//    }, 60);
-//};
+exports.scan = function (test) {
+    var to = setTimeout(function () {
+        assert.fail('Never finished');
+    }, 1000);
+    
+    var em = new EventEmitter;
+    Parser.Stream(em)
+        .word8('a')
+        .scan('l1', new Buffer('\r\n'))
+        .scan('l2', '\r\n')
+        .word8('z')
+        .tap(function (vars) {
+            clearTimeout(to);
+            assert.equal(vars.a, 99);
+            assert.equal(vars.l1.toString(), 'foo bar');
+            assert.equal(vars.l2.toString(), 'baz');
+            assert.equal(vars.z, 42);
+            test.finish()
+        })
+    ;
+    
+    setTimeout(function () {
+        em.emit('data', new Buffer([99,0x66,0x6f,0x6f,0x20]));
+    }, 20);
+    
+    setTimeout(function () {
+        em.emit('data', new Buffer('bar\r'));
+    }, 40);
+    
+    setTimeout(function () {
+        em.emit('data', new Buffer('\nbaz\r\n*'));
+    }, 60);
+};
 
-//exports.scanBuf = function (test) {
-//    var vars = Binary(new Buffer('\x63foo bar\r\nbaz\r\n*'))
-//        .word8('a')
-//        .scan('l1', new Buffer('\r\n'))
-//        .scan('l2', '\r\n')
-//        .word8('z')
-//        .vars
-//    ;
-//    assert.deepEqual(vars.a, 99);
-//    assert.deepEqual(vars.z, 42);
-//    assert.deepEqual(vars.l1.toString(), 'foo bar');
-//    assert.deepEqual(vars.l2.toString(), 'baz');
-//};
+exports.scanBuf = function (test) {
+    Parser(new Buffer('\x63foo bar\r\nbaz\r\n*'))
+        .word8('a')
+        .scan('l1', new Buffer('\r\n'))
+        .scan('l2', '\r\n')
+        .word8('z')
+        .tap(function(vars) {
+            assert.equal(vars.a, 99);
+            assert.equal(vars.z, 42);
+            assert.equal(vars.l1.toString(), 'foo bar');
+            assert.equal(vars.l2.toString(), 'baz');
+            test.finish()
+        })
+        .run()
+    ;
+};
 
 //exports.scanBufNull = function (test) {
 //    var vars = Binary(new Buffer('\x63foo bar baz'))

@@ -76,8 +76,6 @@ Todo
 Lots of things are still missing, including (in no particular order):
 
  *   The ability for my bufferlist to return new bufferlists (for use with scan)
- *   .into(). This would require less independence between ChainProvider and Parser, I think.
-    .word8('stuff.other.stuff') is supported though.
  *   Proper support for reading from buffers (including cutoff)
  *   Stream ending. That could be important. (the ability to stop parsing).
      Can't use .end() though, node-bufferlist used to use that as a .run() method,

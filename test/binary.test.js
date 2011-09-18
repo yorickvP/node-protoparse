@@ -731,85 +731,86 @@ exports.nested = function (test) {
     }, 50);
 };
 
-//exports.intoBuffer = function (test) {
-//    var to = setTimeout(function () {
-//        assert.fail('never finished');
-//    }, 500);
-//    
-//    var buf = new Buffer([ 1, 2, 3, 4, 5, 6 ])
-//    
-//    Binary.parse(buf)
-//        .into('moo', function () {
-//            this
-//                .word8('x')
-//                .word8('y')
-//                .word8('z')
-//            ;
-//        })
-//        .tap(function (vars) {
-//            assert.deepEqual(vars, { moo : { x : 1, y : 2, z : 3 } });
-//        })
-//        .word8('w')
-//        .tap(function (vars) {
-//            assert.deepEqual(vars, {
-//                moo : { x : 1, y : 2, z : 3 },
-//                w : 4,
-//            });
-//        })
-//        .word8('x')
-//        .tap(function (vars) {
-//            assert.deepEqual(vars, {
-//                moo : { x : 1, y : 2, z : 3 },
-//                w : 4,
-//                x : 5,
-//            });
-//            clearTimeout(to);
-//        })
-//    ;
-//}
+exports.intoBuffer = function (test) {
+    var to = setTimeout(function () {
+        assert.fail('never finished');
+    }, 500);
+    
+    var buf = new Buffer([ 1, 2, 3, 4, 5, 6 ])
+    
+    Parser(buf)
+        .into('moo', function () {
+            this.word8('x')
+                .word8('y')
+                .word8('z')
+            ;
+        })
+        .tap(function (vars) {
+            assert.deepEqual(vars, { moo : { x : 1, y : 2, z : 3 } });
+        })
+        .word8('w')
+        .tap(function (vars) {
+            assert.deepEqual(vars, {
+                moo : { x : 1, y : 2, z : 3 },
+                w : 4,
+            });
+        })
+        .word8('x')
+        .tap(function (vars) {
+            assert.deepEqual(vars, {
+                moo : { x : 1, y : 2, z : 3 },
+                w : 4,
+                x : 5,
+            });
+            test.finish();
+            clearTimeout(to);
+        })
+        .run()
+    ;
+}
 
-//exports.intoStream = function (test) {
-//    var to = setTimeout(function () {
-//        assert.fail('never finished');
-//    }, 500);
-//    
-//    var digits = [ 1, 2, 3, 4, 5, 6 ];
-//    var stream = new EventEmitter;
-//    var iv = setInterval(function () {
-//        var d = digits.shift();
-//        if (d) stream.emit('data', new Buffer([ d ]))
-//        else clearInterval(iv)
-//    }, 20);
-//    
-//    Binary.stream(stream)
-//        .into('moo', function () {
-//            this
-//                .word8('x')
-//                .word8('y')
-//                .word8('z')
-//            ;
-//        })
-//        .tap(function (vars) {
-//            assert.deepEqual(vars, { moo : { x : 1, y : 2, z : 3 } });
-//        })
-//        .word8('w')
-//        .tap(function (vars) {
-//            assert.deepEqual(vars, {
-//                moo : { x : 1, y : 2, z : 3 },
-//                w : 4,
-//            });
-//        })
-//        .word8('x')
-//        .tap(function (vars) {
-//            assert.deepEqual(vars, {
-//                moo : { x : 1, y : 2, z : 3 },
-//                w : 4,
-//                x : 5,
-//            });
-//            clearTimeout(to);
-//        })
-//    ;
-//};
+exports.intoStream = function (test) {
+    var to = setTimeout(function () {
+        assert.fail('never finished');
+    }, 500);
+    
+    var digits = [ 1, 2, 3, 4, 5, 6 ];
+    var stream = new EventEmitter;
+    var iv = setInterval(function () {
+        var d = digits.shift();
+        if (d) stream.emit('data', new Buffer([ d ]))
+        else clearInterval(iv)
+    }, 20);
+    
+    Parser.Stream(stream)
+        .into('moo', function () {
+            this.word8('x')
+                .word8('y')
+                .word8('z')
+            ;
+        })
+        .tap(function (vars) {
+            assert.deepEqual(vars, { moo : { x : 1, y : 2, z : 3 } });
+        })
+        .word8('w')
+        .tap(function (vars) {
+            assert.deepEqual(vars, {
+                moo : { x : 1, y : 2, z : 3 },
+                w : 4,
+            });
+        })
+        .word8('x')
+        .tap(function (vars) {
+            assert.deepEqual(vars, {
+                moo : { x : 1, y : 2, z : 3 },
+                w : 4,
+                x : 5,
+            });
+            clearTimeout(to);
+            test.finish();
+        })
+    ;
+};
 
 //exports.peek = function (test) {
 //    var to = setTimeout(function () {

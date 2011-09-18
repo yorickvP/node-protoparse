@@ -1,12 +1,17 @@
 function ChainProvider(prototype) {
     if (!prototype) prototype = ChainProvider.prototype
     var o = Object.create(prototype)
-    o._queue = []
+    var q = o._queue = []
+    o.stop = clearArray.bind(null, q)
     return o }
 
 function K(x) { return function() { return x } }
 
 var Ktrue = K(true)
+
+function clearArray(arr) { // recursively clean out arrays. useful for ending chains
+    arr.forEach(function(x) { if (Array.isArray(x)) clearArray(x) })
+    arr.length = 0 }
 
 ChainProvider.prototype =
     { _provide: function() {

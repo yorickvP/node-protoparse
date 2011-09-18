@@ -14,7 +14,7 @@ function Parser(buffer, prototype, keystore_proto) {
             i.f.call(this, this._keystore, this._buffer, this._buffer.bytes)
         return this }
     cp.flush = function() {
-        return this.tap(function(k) { for (var x in k) delete k[x] })}
+        return this.tap(function(k) { for (var x in k) delete k[x] }, true)}
     cp.addData = function(buffer) {
         cp._buffer.addData(buffer)
         return cp.run() }

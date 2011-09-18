@@ -4,13 +4,13 @@ var    BufferList = require('./bufferlist.js')
 var Chain_Binary = Object.create(ChainProvider.prototype)
 
 Chain_Binary.skip = function(no_bytes) {
-    return this.tap(function(k, b) { b.getbytes(no_bytes) },
-                    function(k, b) { return b.bytes >= no_bytes }, true) }
+    return this.tap(function(k, b) { b.getbytes(no_bytes) }, true,
+                    function(k, b) { return b.bytes >= no_bytes }) }
 
 Chain_Binary.buffer = function(target, n) {
     return this.tap(function(k, b) {
-        k._set(target, b.getbuffer((typeof n == 'string') ? k._get(n) : n)) },
-        function(k, b) { return b.bytes >= ((typeof n == 'string') ? k._get(n) : n) }, true) }
+        k._set(target, b.getbuffer((typeof n == 'string') ? k._get(n) : n)) }, true,
+        function(k, b) { return b.bytes >= ((typeof n == 'string') ? k._get(n) : n) }) }
         
 Chain_Binary.scan = function(target, needle) {
     //var out = BufferList()
@@ -20,7 +20,7 @@ Chain_Binary.scan = function(target, needle) {
         if (pos != -1) { 
             k._set(target, b.getbuffer(pos))
             b.getbytes(needle.length) }
-    }, function(k, b) { return b.indexOf(needle) != -1 }, true) }
+    }, true, function(k, b) { return b.indexOf(needle) != -1 }) }
 //    return this.loop(function(end) {
 //        this.tap(function(k, b) {
 //        var pos = b.indexOf(needle)
@@ -64,8 +64,8 @@ function decodeLEs(bytes) {
 function decode(bytes, fun) {
     return function(into) {
         this.tap(function(keystore, buffer) {
-            keystore._set(into, fun(buffer.getbytes(bytes))) }
-          , function(k, b) { return b.bytes >= bytes }, true)
+            keystore._set(into, fun(buffer.getbytes(bytes))) }, true
+          , function(k, b) { return b.bytes >= bytes })
         return this }}
 
 [1, 2, 3, 4, 5, 6, 7, 8].forEach(function(bytes) {

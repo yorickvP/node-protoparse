@@ -390,7 +390,7 @@ exports.loop = function (test) {
                 .tap(function(vars) {
                     times++
                     if (vars.c < 0) end()
-                }, null, true)
+                }, true)
         })
         .tap(function (vars) {
             clearTimeout(to);

@@ -19,7 +19,7 @@ ChainProvider.prototype =
             q = q[0] }
         if (q[0].condition.apply(this, arguments)) {
             return q.shift() }}
-    , tap: function(f, condition, nonest) { // pass nonest to true to make a lightweight tap
+    , tap: function(f, nonest, condition) { // pass nonest to true to make a lightweight tap
         if (!condition) condition = Ktrue
         var a
         if (!nonest) a = []
@@ -44,7 +44,7 @@ ChainProvider.prototype =
                 var b = this._queue // temporarily restore the queue to a
                 this._queue = a
                 if (!isended) loop.call(this, arguments) // I guess you could call it recursion
-                this._queue = b }, null, true) })}}      // and maybe it is.
+                this._queue = b }, true) })}}            // and maybe it is.
 
 if (module && module.exports) {
     module.exports = ChainProvider

@@ -20,7 +20,7 @@ function Parser(buffer, prototype, keystore_proto) {
     cp.into = function(target, f) {
         return this.tap(function() {
             var k = this._keystore
-            this._keystore = k._set(target, KeyStore(Object.getPrototypeOf(k)))
+            this._keystore = k._set(target, KeyStore(null, k))
             f.apply(this, arguments)
             this._keystore = k })}
     cp.addData = function(buffer) {

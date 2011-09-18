@@ -68,7 +68,7 @@ function decode(bytes, fun) {
           , function(k, b) { return b.bytes >= bytes })
         return this }}
 
-[1, 2, 3, 4, 5, 6, 7, 8].forEach(function(bytes) {
+;[1, 2, 3, 4, 5, 6, 7, 8].forEach(function(bytes) {
         var bits = bytes * 8
         var s = Chain_Binary
         s['word' + bits + 'le'] =

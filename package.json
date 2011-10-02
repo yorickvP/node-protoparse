@@ -1,5 +1,6 @@
 {
   "author": "Yorick",
+  "license": "ISC",
   "name": "protoparse",
   "description": "parse (binary) network protocols",
   "version": "0.0.0",

@@ -3,10 +3,10 @@
   "license": "ISC",
   "name": "protoparse",
   "description": "parse (binary) network protocols",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "repository": {
     "type": "git",
-    "url": "http://github.com/yorickvP/node-protoparse.git"
+    "url": "git://github.com/yorickvP/node-protoparse.git"
   },
   "main": "index.js",
   "scripts": {
